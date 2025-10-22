@@ -5,7 +5,7 @@ import time
 lesson_data = a2_data.lesson_data
 
 def quiz(modules, quiz_level):
-
+    
     for i, q in enumerate(modules["quiz_section"][quiz_level], start=1):
         print(f"Q{i}. ", q["question"])
 
@@ -36,10 +36,9 @@ def quiz(modules, quiz_level):
         print("")
 
 def lesson_summary(modules, quiz_level):
+    score = progress[modules["title"]]["score"]
     # summary of progress
-    # total_questions = len(modules["quiz_section"].get(quiz_level, []))
-    total_questions = progress[modules["title"]]["score"] + progress[modules["title"]]["mistake"]
-    score = progress["TOTAL_SCORE"]["score"]
+    total_questions = progress[modules["title"]]["score"] + progress[modules["title"]]["mistake"] # to ensure all questions are counted in a lesson
     total_mistakes = progress["TOTAL_SCORE"]["total_mistakes"]
     correct_answers = score / total_questions * 100
 
@@ -73,24 +72,30 @@ for idx, modules in enumerate(lesson_data["modules"], start=1):
         print(f"{i}. {marathi} - {english}")
     print()
 
-    # quiz
-    print("Quiz 1:")
-    quiz(modules, "quiz1")
-    total_questions, total_mistakes, correct_answers = lesson_summary(modules, "quiz1")
-    
-    if correct_answers >= 100:
-        print("\nCongratulations! You have passed the lesson. \n\nQuiz 2:")
-        quiz(modules, "quiz2")
-        total_questions, total_mistakes, correct_answers = lesson_summary(modules, "quiz2")
-        total_questions += total_questions
-        if correct_answers >= 100:
-            print("Awesome! You have completed the lesson successfully!\n")
-        else:
-            print("You did not pass the second quiz. I will spank your ass! Do it again!\n")
-    else:
-        print("You did not pass the lesson. I will spank your ass! \nDo it again!\n")
+    # for Quiz 1
+    while True:
+        print("Quiz 1:")
         quiz(modules, "quiz1")
         total_questions, total_mistakes, correct_answers = lesson_summary(modules, "quiz1")
+
+        if correct_answers == 100:
+            print("\nCongratulations! You have passed the lesson. \n\nQuiz 2:")
+            break # Exit loop 1
+        else:
+            print("You did not pass the second quiz. I will spank your ass! \nDo it again!\n")
+    print("")
+
+    # for Quiz 2
+    print("Quiz 2:")
+    while True:
+        quiz(modules, "quiz2")
+        total_questions, total_mistakes, correct_answers = lesson_summary(modules, "quiz2")
+        
+        if correct_answers == 100:
+            print("\nCongratulations! You have passed the lesson.")
+            break # Exit loop 1
+        else:
+            print("You did not pass the second quiz. I will spank your ass! \nDo it again!\n")
     print("")
 
     end_time = time.time()
