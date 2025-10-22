@@ -38,7 +38,9 @@ def quiz(modules, quiz_level):
 def lesson_summary(modules, quiz_level):
     score = progress[modules["title"]]["score"]
     # summary of progress
-    total_questions = progress[modules["title"]]["score"] + progress[modules["title"]]["mistake"] # to ensure all questions are counted in a lesson
+    # total_questions = len(modules["quiz_section"].get(quiz_level, []))
+    total_questions = progress[modules["title"]]["score"] + progress[modules["title"]]["mistake"]
+    score = progress["TOTAL_SCORE"]["score"]
     total_mistakes = progress["TOTAL_SCORE"]["total_mistakes"]
     correct_answers = score / total_questions * 100
 
