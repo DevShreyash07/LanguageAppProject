@@ -1,8 +1,12 @@
 import a2_data
+import a3_feedbackmode
+import random
 import time
 
 # import data
 lesson_data = a2_data.lesson_data
+MODE = a3_feedbackmode.MODE
+RESPONSES = a3_feedbackmode.RESPONSES
 
 def quiz(modules, quiz_level):
     for i, q in enumerate(modules["quiz_section"][quiz_level], start=1):
@@ -22,14 +26,15 @@ def quiz(modules, quiz_level):
         # conditions
         if user_input < 1 or user_input > len(q["options"]):
             print("Incorrect option bro!")
+    
             quiz_progress[modules["title"]]["quiz_mistakes"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_mistakes"] += 1
         elif q["options"][user_input - 1] == q["answer"]:
-            print("Correct!")
+            feedback_mode_correct()
             quiz_progress[modules["title"]]["quiz_score"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_score"] += 1
         else:
-            print("Wrong! Correct option is: ", q["answer"])
+            feedback_mode_incorrect()
             quiz_progress[modules["title"]]["quiz_mistakes"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_mistakes"] += 1
 
@@ -42,7 +47,7 @@ def lesson_summary(modules):
     total_mistakes = quiz_progress[modules["title"]]["quiz_mistakes"]
     correct_answers = total_score / total_questions * 100 if total_questions > 0 else 0
 
-    print("Progress Summary:")
+    print("Progress Summary: ")
     print(f"Total Questions: {total_questions}")
     print(f"Quiz Score: {total_score}")
     print(f"Quiz Mistakes: {total_mistakes}")
@@ -50,6 +55,39 @@ def lesson_summary(modules):
 
     return total_questions, total_mistakes, correct_answers
 
+def feedback_mode_correct():
+    select_mode = random.choice(MODE)
+    select_line = random.choice(RESPONSES["correct"][select_mode])
+    print(select_line)
+
+    # while True:
+    #     try:
+    #         choice = int(input("Enter a number: "))
+    #         if 1 <= choice <= len(MODE):
+    #             selected_mode = MODE[choice - 1]
+    #             print(f"Selected Mode: {selected_mode.capitalize()}\n")
+    #             return selected_mode
+    #         else:
+    #             print("Invalid choice. Try again.")
+    #     except ValueError:
+    #         print("Invalid input. Please enter a number.")
+
+def feedback_mode_incorrect():
+    select_mode = random.choice(MODE)
+    select_line = random.choice(RESPONSES["incorrect"][select_mode])
+    print(select_line)
+
+    # while True:
+    #     try:
+    #         choice = int(input("Enter a number: "))
+    #         if 1 <= choice <= len(MODE):
+    #             selected_mode = MODE[choice - 1]
+    #             print(f"Selected Mode: {selected_mode.capitalize()}\n")
+    #             return selected_mode
+    #         else:
+    #             print("Invalid choice. Try again.")
+    #     except ValueError:
+    #         print("Invalid input. Please enter a number.")
 
 # Main info
 print("Subject:", lesson_data["subject"])
