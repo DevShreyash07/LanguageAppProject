@@ -8,6 +8,7 @@ lesson_data = a2_data.lesson_data
 MODE = a3_feedbackmode.MODE
 RESPONSES = a3_feedbackmode.RESPONSES
 
+# Quiz questions, options, user input, answers, feedback and question scoring function
 def quiz(modules, quiz_level):
     for i, q in enumerate(modules["quiz_section"][quiz_level], start=1):
         print(f"Q{i}. ", q["question"])
@@ -25,22 +26,23 @@ def quiz(modules, quiz_level):
 
         # conditions
         if user_input < 1 or user_input > len(q["options"]):
-            print("Incorrect option bro!")
-    
+            result = "incorrect option"
             quiz_progress[modules["title"]]["quiz_mistakes"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_mistakes"] += 1
         elif q["options"][user_input - 1] == q["answer"]:
-            feedback_mode_correct()
+            result = "correct answer"
             quiz_progress[modules["title"]]["quiz_score"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_score"] += 1
         else:
-            feedback_mode_incorrect()
+            result = "incorrect answer"
             quiz_progress[modules["title"]]["quiz_mistakes"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_mistakes"] += 1
-
+        
+        print(feedback_mode(result))
         print(f"Score: {quiz_progress[modules['title']]['quiz_score']}, Mistakes: {quiz_progress[modules['title']]['quiz_mistakes']}\n")
+    return result
 
-
+# Lesson summary function
 def lesson_summary(modules):
     total_questions = quiz_progress[modules["title"]]["quiz_score"] + quiz_progress[modules["title"]]["quiz_mistakes"]
     total_score = quiz_progress[modules["title"]]["quiz_score"]
@@ -55,39 +57,17 @@ def lesson_summary(modules):
 
     return total_questions, total_mistakes, correct_answers
 
-def feedback_mode_correct():
+# Feedback mode function
+def feedback_mode(result):
     select_mode = random.choice(MODE)
-    select_line = random.choice(RESPONSES["correct"][select_mode])
-    print(select_line)
-
-    # while True:
-    #     try:
-    #         choice = int(input("Enter a number: "))
-    #         if 1 <= choice <= len(MODE):
-    #             selected_mode = MODE[choice - 1]
-    #             print(f"Selected Mode: {selected_mode.capitalize()}\n")
-    #             return selected_mode
-    #         else:
-    #             print("Invalid choice. Try again.")
-    #     except ValueError:
-    #         print("Invalid input. Please enter a number.")
-
-def feedback_mode_incorrect():
-    select_mode = random.choice(MODE)
-    select_line = random.choice(RESPONSES["incorrect"][select_mode])
-    print(select_line)
-
-    # while True:
-    #     try:
-    #         choice = int(input("Enter a number: "))
-    #         if 1 <= choice <= len(MODE):
-    #             selected_mode = MODE[choice - 1]
-    #             print(f"Selected Mode: {selected_mode.capitalize()}\n")
-    #             return selected_mode
-    #         else:
-    #             print("Invalid choice. Try again.")
-    #     except ValueError:
-    #         print("Invalid input. Please enter a number.")
+    if result == "incorrect option":
+        select_line = random.choice(RESPONSES["incorrect"][select_mode])
+    elif result == "correct answer":
+        select_line = random.choice(RESPONSES["correct"][select_mode])
+    # else:
+        # select_line = random.choice(RESPONSES["incorrect"][select_mode])
+    return select_line
+    
 
 # Main info
 print("Subject:", lesson_data["subject"])
@@ -113,9 +93,10 @@ for idx, modules in enumerate(lesson_data["modules"], start=1):
     # Quiz 1
     while True:
         print("Quiz 1:")
-        quiz(modules, "quiz1")
-        _, _, correct_answers = lesson_summary(modules)
 
+        quiz_data = quiz(modules, "quiz1")
+        _, _, correct_answers = lesson_summary(modules)
+        
         if correct_answers == 100:
             print("Congrats! Passed Quiz 1.\n")
             break
@@ -127,7 +108,8 @@ for idx, modules in enumerate(lesson_data["modules"], start=1):
     # Quiz 2
     while True:
         print("Quiz 2:")
-        quiz(modules, "quiz2")
+
+        quiz_data = quiz(modules, "quiz2")
         _, _, correct_answers = lesson_summary(modules)
 
         if correct_answers == 100:
