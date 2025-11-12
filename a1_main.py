@@ -26,21 +26,21 @@ def quiz(modules, quiz_level):
 
         # conditions
         if user_input < 1 or user_input > len(q["options"]):
-            result = "incorrect option"
+            answer_result = "incorrect option"
             quiz_progress[modules["title"]]["quiz_mistakes"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_mistakes"] += 1
         elif q["options"][user_input - 1] == q["answer"]:
-            result = "correct answer"
+            answer_result = "correct answer"
             quiz_progress[modules["title"]]["quiz_score"] += 1
             lesson_progress["LESSON_SCORE"]["lesson_score"] += 1
         else:
-            result = "incorrect answer"
-            quiz_progress[modules["title"]]["quiz_mistakes"] += 1
+            answer_result = "incorrect answer"
+            quiz_progress[modules["title"]]["quiz_mistakes"] += 1 
             lesson_progress["LESSON_SCORE"]["lesson_mistakes"] += 1
         
-        print(feedback_mode(result))
+        print(feedback_mode("questions_feedback", answer_result))
         print(f"Score: {quiz_progress[modules['title']]['quiz_score']}, Mistakes: {quiz_progress[modules['title']]['quiz_mistakes']}\n")
-    return result
+
 
 # Lesson summary function
 def lesson_summary(modules):
@@ -55,20 +55,29 @@ def lesson_summary(modules):
     print(f"Quiz Mistakes: {total_mistakes}")
     print(f"Correct Answers: {correct_answers:.2f}%\n")
 
+    feedback = "passed" if correct_answers == 100 else "failed"
+
+    print(feedback_mode("lesson_feedback", feedback))
+
     return total_questions, total_mistakes, correct_answers
 
-# Feedback mode function
-def feedback_mode(result):
-    select_mode = random.choice(MODE)
-    if result == "incorrect option":
-        select_line = random.choice(RESPONSES["incorrect"][select_mode])
-    elif result == "correct answer":
-        select_line = random.choice(RESPONSES["correct"][select_mode])
-    # else:
-        # select_line = random.choice(RESPONSES["incorrect"][select_mode])
-    return select_line
-    
 
+# Feedback mode function
+def feedback_mode(response_type: str, feedback_type: str):
+    """
+    response_type: 'questions_feedback', 'quiz_feedback', 'lesson_feedback',
+    feedback_type: 'correct answer', 'incorrect answer', 'incorrect option', 'passed', 'failed',
+    """
+
+    select_mode = random.choice(MODE)
+
+    if response_type not in RESPONSES:
+        return "no value bro!"
+    if feedback_type not in RESPONSES[response_type]:
+        return "nahi milega!"
+    
+    return random.choice(RESPONSES[response_type][feedback_type][select_mode])
+    
 # Main info
 print("Subject:", lesson_data["subject"])
 print("Topic:", lesson_data["topic"], "\n")
@@ -96,12 +105,14 @@ for idx, modules in enumerate(lesson_data["modules"], start=1):
 
         quiz_data = quiz(modules, "quiz1")
         _, _, correct_answers = lesson_summary(modules)
-        
+
         if correct_answers == 100:
             print("Congrats! Passed Quiz 1.\n")
+            print(feedback_mode("questions_feedback", "passed"))
             break
         else:
             print("You did not pass Quiz 1. Try again!\n")
+            print(feedback_mode("questions_feedback", "failed"))
             # reset quiz progress only
             quiz_progress[modules["title"]] = {"quiz_score": 0, "quiz_mistakes": 0}
 
@@ -114,9 +125,11 @@ for idx, modules in enumerate(lesson_data["modules"], start=1):
 
         if correct_answers == 100:
             print("Congrats! Passed Quiz 2.\n")
+            print(feedback_mode("questions_feedback", "passed"))
             break
         else:
             print("You did not pass Quiz 2. Try again!\n")
+            print(feedback_mode("questions_feedback", "failed"))
             # reset quiz progress only
             quiz_progress[modules["title"]] = {"quiz_score": 0, "quiz_mistakes": 0}
 
